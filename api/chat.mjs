@@ -20,8 +20,11 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Llave de API no configurada en Vercel' });
   }
 
-  // 3. Usamos la versión correcta del modelo Gemini que funcionaba desde el principio
-  const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+  // 3. 👇 CONFIGURACIÓN DEL MODELO DE GOOGLE 👇
+  // Este es el modelo exacto que aparece en tu cuenta de Google AI Studio
+  const MODELO_DE_GOOGLE = "gemini-3-flash-preview"; 
+  
+  const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODELO_DE_GOOGLE}:generateContent?key=${apiKey}`;
 
   try {
     // 4. Preparar los datos tal y como los manda tu página HTML
