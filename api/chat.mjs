@@ -20,8 +20,8 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Llave de API no configurada en Vercel' });
   }
 
-  // 3. Usamos el modelo público gemini-1.5-flash
-  const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+  // 3. Usamos el enlace OFICIAL y ESTABLE de Google (v1) y el modelo "latest"
+  const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
 
   try {
     // 4. Preparar los datos tal y como los manda tu página HTML
