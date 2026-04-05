@@ -1,4 +1,4 @@
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   // 1. Cabeceras de seguridad y permisos (CORS)
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -20,12 +20,14 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Llave de API no configurada en Vercel' });
   }
 
-const API_URL = \https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;`
+  // 3. Usamos el modelo público gemini-1.5-flash
+  const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+
   try {
-    // 3. Preparar los datos tal y como los manda tu página HTML
+    // 4. Preparar los datos tal y como los manda tu página HTML
     const bodyString = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
 
-    // 4. Enviar a Google Gemini
+    // 5. Enviar a Google Gemini
     const response = await fetch(API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -34,13 +36,13 @@ const API_URL = \https://generativelanguage.googleapis.com/v1beta/models/gemini-
     
     const data = await response.json();
 
-    // 5. Si Google rechaza la petición, mostrar el error exacto
+    // 6. Si Google rechaza la petición, mostrar el error exacto
     if (!response.ok) {
         console.error("Error de Google:", data);
         return res.status(response.status).json(data);
     }
 
-    // 6. Si todo va bien, devolver el texto al HTML
+    // 7. Si todo va bien, devolver el texto al HTML
     return res.status(200).json(data);
     
   } catch (error) {
