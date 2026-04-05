@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Observatrón: Generador de evaluaciones</title>
+    <!-- Google Fonts: Quicksand (títulos) y Nunito (texto) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        /* === Variables CSS globales (Paleta atractiva y profesional) === */
+        :root {
+            --bg-body: #f0f7ff;
+            --bg-card: #ffffff;
+            --text-main: #2d3436;
+            --text-muted: #636e72;
+            
+            /* Colores vibrantes */
+            --primary: #6c5ce7; /* Morado tecnológico */
+            --primary-hover: #5f27cd;
+            --secondary: #00cec9; /* Turquesa */
+            --secondary-hover: #01a3a4;
+            --accent: #fdcb6e; /* Amarillo cálido */
+            
+            --border-color: #dfe6e9;
+            --focus-ring: rgba(108, 92, 231, 0.3);
+            
+            --success: #00b894;
+            --error: #d63031;
+            
+            --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 8px 15px rgba(0, 0, 0, 0.08);
+            --shadow-hover: 0 15px 25px rgba(0, 0, 0, 0.1);
+            
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            
+            --font-heading: 'Quicksand', sans-serif;
+            --font-body: 'Nunito', sans-serif;
+        }
+
+        /* === Reinicio y estilos base === */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-body);
+            background-image: radial-gradient(#dfe6e9 1px, transparent 1px);
+            background-size: 20px 20px;
+            color: var(--text-main);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1, h2, h3 { font-family: var(--font-heading); font-weight: 700; color: #2d3436; }
+        p { margin-bottom: 1rem; font-size: 1.05rem; }
+
+        .hidden { display: none !important; }
+
+        /* === Pantalla de inicio de sesión === */
+        #loginView {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .login-card {
+            background: var(--bg-card);
+            padding: 3rem 2rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            max-width: 450px;
+            width: 100%;
+            border: 3px solid var(--primary);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 8px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+        }
+
+        .login-card h1 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .login-card p.subtitle {
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            font-size: 1.15rem;
+        }
+
+        .password-input {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1.2rem;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-family: var(--font-body);
+            transition: all 0.3s;
+        }
+
+        .password-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--focus-ring);
+        }
+
+        .btn-login {
+            width: 100%;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 1.1rem;
+            border-radius: var(--radius-md);
+            font-size: 1.2rem;
+            font-weight: 700;
+            font-family: var(--font-heading);
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 1rem;
+        }
+
+        .btn-login:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-instructions {
+            background: none;
+            border: 2px dashed var(--primary);
+            color: var(--primary);
+            width: 100%;
+            padding: 0.9rem;
+            border-radius: var(--radius-md);
+            font-size: 1.05rem;
+            font-weight: 700;
+            font-family: var(--font-heading);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-instructions:hover {
+            background-color: #f1f2f6;
+            color: var(--primary-hover);
+            border-color: var(--primary-hover);
+        }
+
+        #loginError {
+            color: var(--error);
+            font-weight: 600;
+            margin-top: 1rem;
+            font-size: 0.95rem;
+            display: none;
+        }
+
+        /* === Modales compartidos (Instrucciones y ayuda) === */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(45, 52, 54, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            padding: 1rem;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 650px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            animation: modalSlide 0.3s ease-out;
+            border: 4px solid var(--primary);
+        }
+
+        .modal-content.small { max-width: 500px; border-color: var(--secondary); }
+
+        @keyframes modalSlide {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            background-color: var(--primary);
+            color: white;
+            padding: 1.2rem 1.5rem;
+            position: sticky;
+            top: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .modal-header.secondary-header { background-color: var(--secondary); }
+
+        .modal-header h2 {
+            color: white;
+            margin: 0;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem;
+        }
+        
+        .close-modal:hover { transform: scale(1.15); }
+
+        .modal-body { padding: 2rem; }
+        
+        /* Estilos específicos de ayuda */
+        .help-desc { font-weight: 600; color: var(--primary); margin-bottom: 1.5rem; }
+        .help-examples-title { font-family: var(--font-heading); font-size: 1.2rem; border-bottom: 2px solid var(--border-color); padding-bottom: 0.5rem; margin-bottom: 1rem; }
+        .help-list { list-style: none; }
+        .help-list li { margin-bottom: 0.8rem; display: flex; align-items: flex-start; gap: 10px; }
+        .help-list li i { color: var(--secondary); margin-top: 5px; }
+
+        /* Estilos específicos de instrucciones */
+        .step { display: flex; gap: 15px; margin-bottom: 1.5rem; }
+        .step-number {
+            background-color: var(--secondary);
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-family: var(--font-heading);
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .warning-box {
+            background-color: #ffeaa7;
+            border-left: 5px solid #fdcb6e;
+            padding: 1.2rem;
+            border-radius: var(--radius-md);
+            margin-top: 2rem;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        .warning-box i { font-size: 2.2rem; color: #d63031; flex-shrink: 0; }
+        .warning-box p { margin: 0; font-size: 0.95rem; color: #2d3436; }
+        .warning-box strong { font-weight: 700; color: #d63031; }
+
+        /* === Estilos de la aplicación principal === */
+        #appView { display: flex; flex-direction: column; min-height: 100vh; }
+
+        /* Cabecera */
+        header {
+            background-color: var(--bg-card);
+            padding: 1rem 0;
+            box-shadow: var(--shadow-sm);
+            border-bottom: 3px solid var(--primary);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.8rem;
+            font-family: var(--font-heading);
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .logo-icon {
+            background-color: #f0f7ff;
+            color: var(--primary);
+            padding: 0.5rem;
+            border-radius: 50%;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header-badge {
+            font-size: 0.9rem;
+            background-color: #e3f2fd;
+            color: var(--primary);
+            padding: 0.4rem 1rem;
+            border-radius: 9999px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Contenido principal */
+        main {
+            flex-grow: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2.5rem 1.5rem;
+            width: 100%;
+        }
+
+        .intro-text { text-align: center; margin-bottom: 2.5rem; }
+        .intro-text h2 { font-size: 2.2rem; margin-bottom: 0.5rem; color: var(--primary); }
+        .intro-text p { color: var(--text-muted); font-size: 1.15rem; max-width: 700px; margin: 0 auto; }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        .panel {
+            background-color: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            transition: box-shadow 0.3s;
+        }
+        .panel:hover { box-shadow: var(--shadow-hover); }
+
+        /* Formularios */
+        .form-group { margin-bottom: 1.5rem; }
+
+        .form-label-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-label-main {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+            font-family: var(--font-heading);
+            font-size: 1.05rem;
+            color: #2d3436;
+        }
+
+        .btn-help {
+            background: none;
+            border: none;
+            color: var(--secondary);
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: transform 0.2s, color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-help:hover { color: var(--secondary-hover); transform: scale(1.15); }
+
+        .form-hint { font-weight: 400; color: #b2bec3; font-size: 0.85rem; font-family: var(--font-body); }
+
+        .form-control {
+            width: 100%;
+            padding: 0.85rem 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-family: var(--font-body);
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            background-color: #fafbfc;
+            color: var(--text-main);
+            box-sizing: border-box;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--focus-ring);
+            background-color: #ffffff;
+        }
+
+        textarea.form-control { resize: vertical; min-height: 85px; }
+
+        .selectors-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.8rem; }
+
+        .select-wrapper { position: relative; }
+        .select-wrapper select { appearance: none; cursor: pointer; font-weight: 600; padding-right: 2.5rem; }
+        .select-wrapper::after {
+            content: '\f078';
+            font-family: 'FontAwesome';
+            position: absolute;
+            right: 1.2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary);
+            pointer-events: none;
+            font-size: 0.9rem;
+        }
+
+        /* Botón Generar */
+        .btn-primary {
+            width: 100%;
+            background: linear-gradient(135deg, var(--secondary), var(--secondary-hover));
+            color: white;
+            border: none;
+            padding: 1.2rem;
+            border-radius: var(--radius-md);
+            font-size: 1.2rem;
+            font-weight: 700;
+            font-family: var(--font-heading);
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.8rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(0, 206, 201, 0.4);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px) scale(1.01);
+            box-shadow: 0 6px 20px rgba(0, 206, 201, 0.6);
+        }
+
+        .btn-primary:active:not(:disabled) { transform: translateY(0) scale(1); }
+        .btn-primary:disabled { background: #b2bec3; cursor: not-allowed; box-shadow: none; transform: none; }
+
+        /* Panel de resultado */
+        .result-panel {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            min-height: 550px;
+            background-color: #fffdf5; /* Tono cálido libreta */
+            border: 2px dashed #fdcb6e;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #ffeaa7;
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .result-title {
+            font-size: 1.3rem;
+            font-family: var(--font-heading);
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            color: #d63031;
+            font-weight: 700;
+        }
+
+        .btn-copy {
+            background-color: white;
+            border: 2px solid #ffeaa7;
+            color: #d63031;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.2rem;
+            border-radius: var(--radius-md);
+            transition: all 0.2s;
+        }
+
+        .btn-copy:hover {
+            background-color: #d63031;
+            color: white;
+            border-color: #d63031;
+        }
+
+        /* Estados de la interfaz */
+        .ui-state {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: var(--text-muted);
+        }
+
+        .empty-icon { font-size: 4rem; color: #ffeaa7; margin-bottom: 1rem; }
+
+        .loader-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #ffeaa7;
+            border-top: 5px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1.5rem;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .pulse-text { animation: pulse 1.5s infinite; color: var(--primary); font-weight: 700; font-family: var(--font-heading); font-size: 1.2rem;}
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+
+        .result-textarea {
+            width: 100%;
+            flex-grow: 1;
+            padding: 1rem;
+            background-color: transparent;
+            border: none;
+            color: var(--text-main);
+            font-size: 1.1rem;
+            line-height: 1.8;
+            resize: none;
+            font-family: var(--font-body);
+            box-sizing: border-box;
+        }
+        .result-textarea:focus { outline: none; }
+
+        /* Pie de página */
+        footer {
+            background-color: var(--bg-card);
+            border-top: 2px dashed var(--border-color);
+            padding: 1.5rem 0;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 1rem;
+            font-weight: 600;
+            margin-top: auto;
+        }
+
+        /* Notificación Toast */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #2d3436;
+            color: white;
+            padding: 1.2rem 2rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-hover);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transform: translateY(150%);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 3000;
+            font-weight: 700;
+            font-family: var(--font-heading);
+            max-width: 90vw;
+        }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast-icon { font-size: 1.5rem; }
+        .toast-icon.success { color: var(--success); }
+        .toast-icon.error { color: var(--error); }
+
+        /* === Diseño adaptativo (Responsive) === */
+        @media (max-width: 900px) {
+            .dashboard-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+            .selectors-grid { grid-template-columns: 1fr; gap: 1rem; margin-bottom: 1.5rem; }
+            .result-panel { min-height: 400px; }
+        }
+
+        @media (max-width: 600px) {
+            .header-content { flex-direction: column; gap: 1rem; }
+            .intro-text h2 { font-size: 1.8rem; }
+            .intro-text p { font-size: 1rem; }
+            .login-card { padding: 2.5rem 1.5rem; }
+            .panel { padding: 1.5rem; }
+            .modal-body { padding: 1.5rem; }
+            .step { flex-direction: column; gap: 10px; text-align: center; align-items: center; }
+            .warning-box { flex-direction: column; text-align: center; padding: 1rem; }
+            .btn-primary { font-size: 1.1rem; padding: 1rem; }
+        }
+
+        /* Barra de desplazamiento */
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: #f1f2f6; border-radius: 5px; }
+        ::-webkit-scrollbar-thumb { background: #ced6e0; border-radius: 5px; }
+        ::-webkit-scrollbar-thumb:hover { background: #a4b0be; }
+    </style>
+</head>
+<body>
+
+    <!-- ================= PANTALLA DE INICIO DE SESIÓN ================= -->
+    <div id="loginView">
+        <div class="login-card">
+            <h1><i class="fa-solid fa-robot"></i> Observatrón</h1>
+            <p class="subtitle">El cerebro pedagógico para tus evaluaciones</p>
+            
+            <input type="password" id="passwordInput" class="password-input" placeholder="Introduce la contraseña" autocomplete="off">
+            
+            <button id="btnSubmitLogin" class="btn-login">Activar sistema</button>
+            <button id="btnOpenInstructions" class="btn-instructions">
+                <i class="fa-solid fa-book-open"></i> Instrucciones de uso
+            </button>
+
+            <p id="loginError"><i class="fa-solid fa-circle-exclamation"></i> Contraseña incorrecta. Pista: es una comida redonda y deliciosa.</p>
+        </div>
+    </div>
+
+    <!-- ================= MODAL DE INSTRUCCIONES ================= -->
+    <div id="instructionsModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fa-solid fa-map"></i> Cómo usar Observatrón</h2>
+                <button id="btnCloseInstructions" class="close-modal" aria-label="Cerrar instrucciones"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <p>¡Bienvenido/a a Observatrón! Esta herramienta, basada en inteligencia artificial, ha sido diseñada por expertos pedagógicos para ayudarte a redactar informes de evaluación precisos, profesionales y humanos.</p>
+                
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div>
+                        <strong>Selecciona el pronombre:</strong>
+                        <p>Elige cómo debe referirse el texto al estudiante. Esto garantiza la concordancia gramatical en todo el informe.</p>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div>
+                        <strong>Introduce los hitos observados:</strong>
+                        <p>Rellena los campos con palabras clave sobre su desarrollo socioemocional, aprendizajes y áreas de mejora. Si tienes dudas, pulsa el botón de ayuda (<i class="fa-solid fa-circle-info" style="color:var(--secondary)"></i>) de cada apartado para ver ejemplos.</p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div>
+                        <strong>Configura el estilo:</strong>
+                        <p>Elige el tono (más cercano, técnico, etc.) y la extensión deseada para el comentario.</p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div>
+                        <strong>Procesa la información:</strong>
+                        <p>Pulsa en "Generar evaluación" y deja que Observatrón estructure pedagógicamente tus anotaciones.</p>
+                    </div>
+                </div>
+
+                <div class="warning-box">
+                    <i class="fa-solid fa-user-shield"></i>
+                    <div>
+                        <p><strong>Muy importante: anonimato total</strong></p>
+                        <p style="font-weight: 400; margin-top: 5px;">Por motivos de privacidad y protección de datos, <strong>no escribas nunca el nombre real del menor</strong>. Observatrón redactará informes genéricos listos para que tú añadas el nombre posteriormente en la plataforma oficial del centro.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= MODAL DE AYUDA (DINÁMICO) ================= -->
+    <div id="helpModal" class="modal-overlay hidden">
+        <div class="modal-content small">
+            <div class="modal-header secondary-header">
+                <h2 id="helpModalTitle"><i class="fa-solid fa-lightbulb"></i> Título de ayuda</h2>
+                <button id="btnCloseHelp" class="close-modal" aria-label="Cerrar ayuda"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <p id="helpModalDesc" class="help-desc">Descripción de lo que debes poner aquí.</p>
+                <h3 class="help-examples-title">5 Ejemplos para inspirarte:</h3>
+                <ul id="helpModalList" class="help-list">
+                    <!-- Los ejemplos se inyectarán con JS -->
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= APLICACIÓN PRINCIPAL ================= -->
+    <div id="appView" class="hidden">
+        
+        <header>
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <i class="fa-solid fa-robot"></i>
+                    </div>
+                    <span>Observatrón</span>
+                </div>
+                <div class="header-badge">
+                    <i class="fa-solid fa-shield-halved"></i> 100 % Anónimo
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <div class="intro-text">
+                <h2>Motor de evaluaciones</h2>
+                <p>Introduce las palabras clave de la observación en el aula y Observatrón generará un informe estructurado, pedagógico y libre de sesgos identitarios.</p>
+            </div>
+
+            <div class="dashboard-grid">
+                
+                <!-- Panel de entrada de datos -->
+                <div class="panel form-panel">
+                    
+                    <div class="form-group">
+                        <div class="form-label-container">
+                            <div class="form-label-main">
+                                Referencia gramatical
+                                <button class="btn-help" data-help="gender" title="Ayuda sobre este apartado"><i class="fa-solid fa-circle-info"></i></button>
+                            </div>
+                            <span class="form-hint">Mantiene el anonimato</span>
+                        </div>
+                        <div class="select-wrapper">
+                            <select id="gender" class="form-control">
+                                <option value="el alumno">Masculino (el alumno)</option>
+                                <option value="la alumna">Femenino (la alumna)</option>
+                                <option value="el o la estudiante">Neutro (el/la estudiante)</option>
+                                <option value="el o la peque">Cariñoso (el/la peque)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="form-label-container">
+                            <div class="form-label-main">
+                                Desarrollo socioemocional y actitud
+                                <button class="btn-help" data-help="attitude" title="Ayuda sobre este apartado"><i class="fa-solid fa-circle-info"></i></button>
+                            </div>
+                        </div>
+                        <textarea id="attitude" class="form-control" placeholder="Gestión de emociones, relación con iguales, participación, respeto a normas..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="form-label-container">
+                            <div class="form-label-main">
+                                Desarrollo cognitivo y aprendizajes
+                                <button class="btn-help" data-help="academic" title="Ayuda sobre este apartado"><i class="fa-solid fa-circle-info"></i></button>
+                            </div>
+                        </div>
+                        <textarea id="academic" class="form-control" placeholder="Asimilación de contenidos, destrezas, ritmo de trabajo, puntos fuertes..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="form-label-container">
+                            <div class="form-label-main">
+                                Oportunidades de crecimiento (Mejora)
+                                <button class="btn-help" data-help="improvement" title="Ayuda sobre este apartado"><i class="fa-solid fa-circle-info"></i></button>
+                            </div>
+                            <span class="form-hint">Opcional</span>
+                        </div>
+                        <textarea id="improvement" class="form-control" rows="2" placeholder="Aspectos a reforzar, dificultades puntuales o focos de atención..."></textarea>
+                    </div>
+
+                    <div class="selectors-grid">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label class="form-label-main" for="tone" style="margin-bottom: 0.5rem;">Tono de redacción</label>
+                            <div class="select-wrapper">
+                                <select id="tone" class="form-control">
+                                    <option value="Constructivo, motivador y muy amable">Motivador y cariñoso</option>
+                                    <option value="Formal, profesional y equilibrado">Profesional y equilibrado</option>
+                                    <option value="Altamente técnico, empleando jerga pedagógica actual">Técnico pedagógico</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label class="form-label-main" for="length" style="margin-bottom: 0.5rem;">Extensión</label>
+                            <div class="select-wrapper">
+                                <select id="length" class="form-control">
+                                    <option value="Un párrafo mediano y bien cohesionado">Media</option>
+                                    <option value="Breve, directo al grano (máx. 3 líneas)">Breve</option>
+                                    <option value="Detallada, estructurada en varios párrafos por dimensiones">Detallada</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button id="generateBtn" class="btn-primary">
+                        <i class="fa-solid fa-microchip"></i>
+                        Generar evaluación
+                    </button>
+                </div>
+
+                <!-- Panel de resultados -->
+                <div class="panel result-panel">
+                    
+                    <div class="result-header">
+                        <div class="result-title">
+                            <i class="fa-solid fa-file-signature"></i>
+                            Informe generado
+                        </div>
+                        <button id="copyBtn" class="btn-copy" style="display: none;" title="Copiar texto">
+                            <i class="fa-regular fa-copy"></i>
+                            <span>Copiar informe</span>
+                        </button>
+                    </div>
+
+                    <!-- Estado: Vacío -->
+                    <div id="uiEmpty" class="ui-state">
+                        <i class="fa-solid fa-inbox empty-icon"></i>
+                        <h3 style="font-family: var(--font-heading);">Sistemas preparados</h3>
+                        <p>Introduce las variables a la izquierda y acciona el botón para procesar y estructurar la evaluación.</p>
+                    </div>
+
+                    <!-- Estado: Cargando -->
+                    <div id="uiLoading" class="ui-state hidden">
+                        <div class="loader-spinner"></div>
+                        <h3 class="pulse-text">Procesando datos pedagógicos...</h3>
+                        <p>Estructurando el texto y aplicando normativas ortográficas.</p>
+                    </div>
+
+                    <!-- Estado: Error -->
+                    <div id="uiError" class="ui-state hidden" style="color: var(--error);">
+                        <i class="fa-solid fa-circle-exclamation empty-icon" style="color: var(--error);"></i>
+                        <h3 style="font-family: var(--font-heading);">Fallo en la conexión</h3>
+                        <p id="errorMessage">El servidor de la IA no responde. Por favor, revisa tu conexión e inténtalo de nuevo.</p>
+                    </div>
+
+                    <!-- Estado: Resultado -->
+                    <div id="uiResult" class="ui-state hidden" style="align-items: stretch; text-align: left;">
+                        <textarea id="resultText" class="result-textarea" readonly></textarea>
+                    </div>
+
+                </div>
+
+            </div>
+        </main>
+
+        <!-- Pie de página -->
+        <footer>
+            Hecho por maestro Manuel Adolfo
+        </footer>
+    </div>
+
+    <!-- Notificación emergente (Toast) -->
+    <div id="toast" class="toast">
+        <i id="toastIcon" class="fa-solid fa-circle-check toast-icon success"></i>
+        <span id="toastMessage">Texto copiado correctamente</span>
+    </div>
+
+    <!-- ================= LÓGICA DE LA APLICACIÓN ================= -->
+    <script>
+        // Configuración de la API (Conectando de forma segura a Vercel)
+const API_URL = `/api/chat`;
+
+        // Datos para los modales de ayuda (Títulos, descripciones y ejemplos)
+        const helpData = {
+            gender: {
+                title: "Referencia gramatical",
+                desc: "Debes seleccionar la forma con la que la inteligencia artificial se referirá al menor a lo largo del texto. Esto asegura la coherencia de género y número sin desvelar su identidad.",
+                examples: [
+                    "El alumno",
+                    "La alumna",
+                    "El estudiante",
+                    "La estudiante",
+                    "El peque / La peque (para perfiles más infantiles)"
+                ]
+            },
+            attitude: {
+                title: "Desarrollo socioemocional y actitud",
+                desc: "Anota palabras o frases breves sobre su inteligencia intrapersonal (gestión de emociones, autonomía) e interpersonal (relación con los iguales, respeto de normas de convivencia).",
+                examples: [
+                    "Empático y siempre dispuesto a colaborar con sus compañeros.",
+                    "En ocasiones le cuesta gestionar la frustración ante el error.",
+                    "Muy participativa y líder positivo durante las asambleas.",
+                    "Muestra un gran respeto por los materiales y normas del aula.",
+                    "Disfruta mucho compartiendo el juego simbólico."
+                ]
+            },
+            academic: {
+                title: "Desarrollo cognitivo y aprendizajes",
+                desc: "Refleja sus habilidades, adquisición de destrezas curriculares, ritmo de trabajo, puntos fuertes y grado de asimilación de los contenidos trabajados.",
+                examples: [
+                    "Excelente nivel de comprensión lectora y expresión escrita.",
+                    "Demuestra gran creatividad y destreza en el área de plástica.",
+                    "Destaca su razonamiento lógico-matemático en la resolución de problemas.",
+                    "Presenta una expresión oral muy rica, fluida y estructurada.",
+                    "Mantiene un ritmo de trabajo constante, ordenado y muy autónomo."
+                ]
+            },
+            improvement: {
+                title: "Oportunidades de crecimiento",
+                desc: "Indica aquellas áreas o dificultades que requieren mayor atención o refuerzo. La IA se encargará de redactarlas desde un enfoque positivo y constructivo.",
+                examples: [
+                    "Debe mejorar la direccionalidad del trazo y la grafomotricidad.",
+                    "Necesita reforzar la atención sostenida en tareas largas.",
+                    "Es importante fomentar el hábito de lectura diaria en casa.",
+                    "Ganar seguridad y confianza al exponer o hablar en público.",
+                    "Repasar el cálculo mental y la mecanización de las tablas."
+                ]
+            }
+        };
+
+        // Referencias al DOM (Vistas e inicio de sesión)
+        const loginView = document.getElementById('loginView');
+        const appView = document.getElementById('appView');
+        const passwordInput = document.getElementById('passwordInput');
+        const btnSubmitLogin = document.getElementById('btnSubmitLogin');
+        const loginError = document.getElementById('loginError');
+        
+        // Referencias al DOM (Modales)
+        const instructionsModal = document.getElementById('instructionsModal');
+        const btnOpenInstructions = document.getElementById('btnOpenInstructions');
+        const btnCloseInstructions = document.getElementById('btnCloseInstructions');
+        
+        const helpModal = document.getElementById('helpModal');
+        const btnCloseHelp = document.getElementById('btnCloseHelp');
+        const helpModalTitle = document.getElementById('helpModalTitle');
+        const helpModalDesc = document.getElementById('helpModalDesc');
+        const helpModalList = document.getElementById('helpModalList');
+        const helpButtons = document.querySelectorAll('.btn-help');
+
+        // Referencias al DOM (Aplicación principal)
+        const elements = {
+            btnGenerate: document.getElementById('generateBtn'),
+            btnCopy: document.getElementById('copyBtn'),
+            gender: document.getElementById('gender'),
+            attitude: document.getElementById('attitude'),
+            academic: document.getElementById('academic'),
+            improvement: document.getElementById('improvement'),
+            tone: document.getElementById('tone'),
+            length: document.getElementById('length'),
+            
+            uiEmpty: document.getElementById('uiEmpty'),
+            uiLoading: document.getElementById('uiLoading'),
+            uiResult: document.getElementById('uiResult'),
+            uiError: document.getElementById('uiError'),
+            
+            resultText: document.getElementById('resultText'),
+            errorMessage: document.getElementById('errorMessage'),
+            
+            toast: document.getElementById('toast'),
+            toastMsg: document.getElementById('toastMessage'),
+            toastIcon: document.getElementById('toastIcon')
+        };
+
+        // ================= LÓGICA DE INICIO DE SESIÓN =================
+        function attemptLogin() {
+            const pass = passwordInput.value.trim().toLowerCase();
+            if (pass === 'pizza') {
+                loginView.classList.add('hidden');
+                appView.classList.remove('hidden');
+                instructionsModal.classList.add('hidden');
+            } else {
+                loginError.style.display = 'block';
+                passwordInput.style.transform = 'translateX(-5px)';
+                setTimeout(() => passwordInput.style.transform = 'translateX(5px)', 100);
+                setTimeout(() => passwordInput.style.transform = 'translateX(-5px)', 200);
+                setTimeout(() => passwordInput.style.transform = 'translateX(0)', 300);
+            }
+        }
+
+        btnSubmitLogin.addEventListener('click', attemptLogin);
+        passwordInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') attemptLogin();
+        });
+        passwordInput.addEventListener('input', () => loginError.style.display = 'none');
+
+        // ================= LÓGICA DE MODALES =================
+        
+        // Modal de instrucciones
+        btnOpenInstructions.addEventListener('click', () => instructionsModal.classList.remove('hidden'));
+        btnCloseInstructions.addEventListener('click', () => instructionsModal.classList.add('hidden'));
+        instructionsModal.addEventListener('click', (e) => {
+            if (e.target === instructionsModal) instructionsModal.classList.add('hidden');
+        });
+
+        // Modales dinámicos de ayuda
+        helpButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const section = btn.getAttribute('data-help');
+                const data = helpData[section];
+                
+                if(data) {
+                    helpModalTitle.innerHTML = `<i class="fa-solid fa-lightbulb"></i> ${data.title}`;
+                    helpModalDesc.textContent = data.desc;
+                    
+                    helpModalList.innerHTML = '';
+                    data.examples.forEach(ex => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `<i class="fa-solid fa-check"></i> <span>${ex}</span>`;
+                        helpModalList.appendChild(li);
+                    });
+                    
+                    helpModal.classList.remove('hidden');
+                }
+            });
+        });
+
+        btnCloseHelp.addEventListener('click', () => helpModal.classList.add('hidden'));
+        helpModal.addEventListener('click', (e) => {
+            if (e.target === helpModal) helpModal.classList.add('hidden');
+        });
+
+        // ================= LÓGICA DE IA (GEMINI) =================
+        elements.btnGenerate.addEventListener('click', async () => {
+            const data = {
+                gender: elements.gender.value,
+                attitude: elements.attitude.value.trim(),
+                academic: elements.academic.value.trim(),
+                improvement: elements.improvement.value.trim(),
+                tone: elements.tone.value,
+                length: elements.length.value
+            };
+
+            // Validación: al menos un campo con información
+            if (!data.attitude && !data.academic && !data.improvement) {
+                showToast("Debes introducir al menos un hito u observación para iniciar el proceso.", "error");
+                return;
+            }
+
+            setUIState('loading');
+
+            try {
+                // Instrucciones del sistema (Rol experto pedagógico y RAE)
+                const systemPrompt = `Eres Observatrón, una inteligencia artificial avanzada diseñada para ejercer como experto en pedagogía y evaluación educativa. Tu labor es redactar informes de evaluación escolar, observaciones y boletines de notas con un alto nivel de calidad técnica y humana.
+                
+REGLAS OBLIGATORIAS E INQUEBRANTABLES:
+1. ANONIMATO TOTAL: NUNCA inventes un nombre propio. Refiérete a la persona estrictamente como "${data.gender}".
+2. ORTOGRAFÍA Y GRAMÁTICA (RAE): Aplica estrictamente las normas ortográficas de la Real Academia Española. Evita el uso excesivo de mayúsculas (solo utilízalas a inicio de oración o tras punto).
+3. ESTILO Y TONO: Debe ser ${data.tone}.
+4. EXTENSIÓN: ${data.length}.
+ESTRUCTURA PEDAGÓGICA REQUERIDA: Conecta los enunciados de forma fluida. Si es pertinente, comienza con el desarrollo socioemocional, seguido del desarrollo cognitivo y finaliza con las oportunidades de crecimiento siempre formuladas como retos positivos y constructivos.
+Devuelve directamente el texto del informe, sin títulos, sin saludos, sin despedidas, ni comillas envolventes.`;
+
+                // Petición del usuario (Mapeo de las nuevas áreas pedagógicas)
+                let userPrompt = `Redacta el informe de evaluación basándote EXCLUSIVAMENTE en estas observaciones:\n`;
+                if (data.attitude) userPrompt += `- Desarrollo socioemocional y actitud: ${data.attitude}\n`;
+                if (data.academic) userPrompt += `- Desarrollo cognitivo y aprendizajes: ${data.academic}\n`;
+                if (data.improvement) userPrompt += `- Oportunidades de crecimiento (Mejoras): ${data.improvement}\n`;
+
+                const payload = {
+                    contents: [{ parts: [{ text: userPrompt }] }],
+                    systemInstruction: { parts: [{ text: systemPrompt }] }
+                };
+
+                const responseData = await fetchWithRetry(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const generatedText = responseData.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                if (generatedText) {
+                    elements.resultText.value = generatedText.trim();
+                    setUIState('result');
+                } else {
+                    throw new Error("Respuesta inesperada de la API");
+                }
+
+            } catch (error) {
+                console.error("Error en el procesamiento:", error);
+                elements.errorMessage.textContent = "Error en el procesamiento de la IA. Comprueba la red e inténtalo de nuevo.";
+                setUIState('error');
+            }
+        });
+
+        // Evento de copiado
+        elements.btnCopy.addEventListener('click', () => {
+            elements.resultText.select();
+            document.execCommand('copy');
+            window.getSelection().removeAllRanges(); 
+            
+            showToast("¡Informe copiado al portapapeles!", "success");
+            
+            const originalHTML = elements.btnCopy.innerHTML;
+            elements.btnCopy.innerHTML = '<i class="fa-solid fa-check"></i><span>Copiado</span>';
+            setTimeout(() => { elements.btnCopy.innerHTML = originalHTML; }, 2000);
+        });
+
+        // ================= FUNCIONES AUXILIARES =================
+        
+        // Función Fetch con reintentos exponenciales
+        async function fetchWithRetry(url, options, maxRetries = 5) {
+            const delays = [1000, 2000, 4000, 8000, 16000];
+            for (let i = 0; i < maxRetries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    return await response.json();
+                } catch (e) {
+                    if (i === maxRetries - 1) throw e;
+                    await new Promise(res => setTimeout(res, delays[i]));
+                }
+            }
+        }
+
+        // Gestión de vistas y estados de la interfaz
+        function setUIState(state) {
+            elements.uiEmpty.classList.add('hidden');
+            elements.uiLoading.classList.add('hidden');
+            elements.uiResult.classList.add('hidden');
+            elements.uiError.classList.add('hidden');
+            elements.btnCopy.style.display = 'none';
+            
+            if (state === 'loading') {
+                elements.btnGenerate.disabled = true;
+                elements.btnGenerate.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Procesando datos...';
+            } else {
+                elements.btnGenerate.disabled = false;
+                elements.btnGenerate.innerHTML = '<i class="fa-solid fa-microchip"></i> Generar evaluación';
+            }
+
+            if (state === 'empty') elements.uiEmpty.classList.remove('hidden');
+            if (state === 'loading') elements.uiLoading.classList.remove('hidden');
+            if (state === 'error') elements.uiError.classList.remove('hidden');
+            if (state === 'result') {
+                elements.uiResult.classList.remove('hidden');
+                elements.btnCopy.style.display = 'flex';
+            }
+        }
+
+        // Sistema de notificaciones emergentes (Toast)
+        let toastTimeout;
+        function showToast(message, type) {
+            clearTimeout(toastTimeout);
+            
+            elements.toastMsg.textContent = message;
+            if (type === 'error') {
+                elements.toastIcon.className = 'fa-solid fa-circle-exclamation toast-icon error';
+            } else {
+                elements.toastIcon.className = 'fa-solid fa-face-smile-beam toast-icon success';
+            }
+            
+            elements.toast.classList.add('show');
+            
+            toastTimeout = setTimeout(() => {
+                elements.toast.classList.remove('show');
+            }, 4000);
+        }
+    </script>
+</body>
+</html>
